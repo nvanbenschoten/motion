@@ -33,17 +33,17 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     /**
      * The intensity of the parallax effect, giving the perspective of depth.
      */
-    private float mIntensity = 1f;
+    private float mParallaxIntensity = 1.0f;
 
     /**
      * The sensitivity the parallax effect has towards tilting.
      */
-    private float mTiltSensitivity = 2.5f;
+    private float mTiltSensitivity = 2.0f;
 
     /**
      * The forward tilt offset adjustment to counteract a natural forward phone tilt.
      */
-    private float mTiltForwardAdjustment = .3f;
+    private float mForwardTiltOffset = 0.3f;
 
     // Instance variables used during matrix manipulation.
     private SensorManager mSensorManager;
@@ -89,13 +89,13 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * Sets the intensity of the parallax effect. The stronger the effect, the more distance
      * the image will have to move around.
      *
-     * @param intensity the new tilt intensity
+     * @param parallaxIntensity the new intensity
      */
-    public void setIntensity(float intensity) {
-        if (intensity <= 1)
-            throw new IllegalArgumentException("Parallax effect must have an intensity of 1.0 or greater");
+    public void setParallaxIntensity(float parallaxIntensity) {
+        if (parallaxIntensity <= 1)
+            throw new IllegalArgumentException("Parallax effect must have a intensity of 1.0 or greater");
 
-        mIntensity = intensity;
+        mParallaxIntensity = parallaxIntensity;
         configureMatrix();
     }
 
@@ -111,16 +111,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     }
 
     /**
-     * Sets the tile forward adjustment dimension, allowing for the image to be
+     * Sets the forward tilt offset dimension, allowing for the image to be
      * centered while the phone is "naturally" tilted forwards.
      *
-     * @param tiltForwardAdjustment the new tilt forward adjustment
+     * @param forwardTiltOffset the new tilt forward adjustment
      */
-    public void setTiltForwardAdjustment(float tiltForwardAdjustment) {
-        if (Math.abs(tiltForwardAdjustment) > 1)
-            throw new IllegalArgumentException("Parallax tilt adjustment must be less than or equal to 1.0");
+    public void setForwardTiltOffset(float forwardTiltOffset) {
+        if (Math.abs(forwardTiltOffset) > 1)
+            throw new IllegalArgumentException("Parallax forward tilt offset must be less than or equal to 1.0");
 
-        mTiltForwardAdjustment = tiltForwardAdjustment;
+        mForwardTiltOffset = forwardTiltOffset;
     }
 
     /**
@@ -157,19 +157,19 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
         if (dWidth * vHeight > vWidth * dHeight) {
             scale = (float) vHeight / (float) dHeight;
-            mXOffset = (vWidth - dWidth * scale * mIntensity) * 0.5f;
-            mYOffset = (vHeight - dHeight * scale * mIntensity) * 0.5f;
+            mXOffset = (vWidth - dWidth * scale * mParallaxIntensity) * 0.5f;
+            mYOffset = (vHeight - dHeight * scale * mParallaxIntensity) * 0.5f;
         } else {
             scale = (float) vWidth / (float) dWidth;
-            mXOffset = (vWidth - dWidth * scale * mIntensity) * 0.5f;
-            mYOffset = (vHeight - dHeight * scale * mIntensity) * 0.5f;
+            mXOffset = (vWidth - dWidth * scale * mParallaxIntensity) * 0.5f;
+            mYOffset = (vHeight - dHeight * scale * mParallaxIntensity) * 0.5f;
         }
 
         dx = mXOffset + mXTranslation;
         dy = mYOffset + mYTranslation;
 
         mTranslationMatrix.set(getImageMatrix());
-        mTranslationMatrix.setScale(mIntensity * scale, mIntensity * scale);
+        mTranslationMatrix.setScale(mParallaxIntensity * scale, mParallaxIntensity * scale);
         mTranslationMatrix.postTranslate(dx, dy);
         setImageMatrix(mTranslationMatrix);
     }
@@ -215,22 +215,22 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         // Adjust for forward tilt based on screen orientation
         switch (rotation) {
             case Surface.ROTATION_90:
-                event.values[2] -= mTiltForwardAdjustment;
+                event.values[2] -= mForwardTiltOffset;
                 if (event.values[2] < -1) event.values[2] += 2;
                 break;
 
             case Surface.ROTATION_180:
-                event.values[1] -= mTiltForwardAdjustment;
+                event.values[1] -= mForwardTiltOffset;
                 if (event.values[1] < -1) event.values[1] += 2;
                 break;
 
             case Surface.ROTATION_270:
-                event.values[2] += mTiltForwardAdjustment;
+                event.values[2] += mForwardTiltOffset;
                 if (event.values[2] > 1) event.values[2] -= 2;
                 break;
 
             default:
-                event.values[1] += mTiltForwardAdjustment;
+                event.values[1] += mForwardTiltOffset;
                 if (event.values[1] > 1) event.values[1] -= 2;
                 break;
         }

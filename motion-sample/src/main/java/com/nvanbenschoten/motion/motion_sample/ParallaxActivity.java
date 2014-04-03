@@ -27,7 +27,8 @@ public class ParallaxActivity extends ActionBarActivity {
     }
 
     /**
-     * A fragment containing a simple parallax image view.
+     * A fragment containing a simple parallax image view and a SeekBar to adjust the
+     * parallax intensity.
      */
     public static class ParallaxFragment extends Fragment {
 
@@ -60,14 +61,17 @@ public class ParallaxActivity extends ActionBarActivity {
             super.onViewCreated(view, savedInstanceState);
 
             // Adjusts the Parallax tilt sensitivity
-            mBackground.setTiltSensitivity(2.2f);
+            mBackground.setTiltSensitivity(2.3f);
+
+            // Adjust the Parallax forward tilt adjustment
+            mBackground.setForwardTiltOffset(.35f);
 
             // Set SeekBar to change parallax intensity
             mSeekBar.setMax(10);
             mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    mBackground.setIntensity(1f + ((float)progress)/10);
+                    mBackground.setParallaxIntensity(1f + ((float) progress) / 10);
                 }
 
                 @Override
