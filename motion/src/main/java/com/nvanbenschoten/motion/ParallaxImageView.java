@@ -23,8 +23,10 @@ import android.widget.ImageView;
 public class ParallaxImageView extends ImageView {
 
     private float mIntensity = 1f;
-    private int mXTranslation = 0;
-    private int mYTranslation = 0;
+    private float mXTranslation = 0;
+    private float mYTranslation = 0;
+    private float mXOffset;
+    private float mYOffset;
 
     public ParallaxImageView(Context context) {
         super(context);
@@ -65,25 +67,30 @@ public class ParallaxImageView extends ImageView {
 
         if (dWidth * vHeight > vWidth * dHeight) {
             scale = (float) vHeight / (float) dHeight;
-            dx = (vWidth - dWidth * scale * mIntensity) * 0.5f;
+            mXOffset = (vWidth - dWidth * scale * mIntensity) * 0.5f;
+            mYOffset = (vHeight - dHeight * scale * mIntensity) * 0.5f;
         } else {
             scale = (float) vWidth / (float) dWidth;
-            dy = (vHeight - dHeight * scale * mIntensity) * 0.5f;
+            mXOffset = (vWidth - dWidth * scale * mIntensity) * 0.5f;
+            mYOffset = (vHeight - dHeight * scale * mIntensity) * 0.5f;
         }
 
-        float xTranslation = dx + mXTranslation;
-        if (xTranslation > 0) xTranslation = 0;
-        if (xTranslation < vWidth - dWidth) xTranslation = dWidth - vWidth;
-
-        float yTranslation = dy + mYTranslation;
-        if (yTranslation > 0) yTranslation = 0;
-        if (yTranslation < vHeight - dHeight) yTranslation = dHeight - vHeight;
+        dx = mXOffset + mXTranslation;
+        dy = mYOffset + mYTranslation;
 
         Matrix matrix = new Matrix();
         matrix.set(getImageMatrix());
         matrix.setScale(mIntensity * scale, mIntensity * scale);
-        matrix.postTranslate(xTranslation, yTranslation);
+        matrix.postTranslate(dx, dy);
         setImageMatrix(matrix);
+    }
+
+    public void setTranslate(float x, float y) {
+        if (Math.abs(x) > 1 || Math.abs(y) > 1) return;
+
+        mXTranslation = x * mXOffset;
+        mYTranslation = y * mYOffset;
+        configureMatrix();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.nvanbenschoten.motion.motion_sample;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
+
+import java.util.Random;
 
 
 public class ParallaxActivity extends ActionBarActivity {
@@ -32,6 +35,7 @@ public class ParallaxActivity extends ActionBarActivity {
     public static class ParallaxFragment extends Fragment {
 
         private ParallaxImageView mBackground;
+        private Runnable mRunnable;
 
         public ParallaxFragment() { }
 
@@ -56,7 +60,21 @@ public class ParallaxActivity extends ActionBarActivity {
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-            mBackground.setIntensity(1.2f);
+            mBackground.setIntensity(1.5f);
+
+            mRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    Random r = new Random();
+                    float x = r.nextInt(2) == 0 ? -1 : 1;
+                    float y = r.nextInt(2) == 0 ? -1 : 1;
+
+                    mBackground.setTranslate(0, 0);
+                    new Handler().postDelayed(mRunnable, 2000);
+                }
+            };
+
+            new Handler().postDelayed(mRunnable, 2000);
         }
 
         @Override
