@@ -1,1 +1,1 @@
-include ':motion'
+include ':motion', ':motion-sample'
