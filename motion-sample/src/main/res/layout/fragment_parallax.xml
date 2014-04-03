@@ -1,5 +1,6 @@
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:parallax="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -8,7 +9,7 @@
             android:id="@android:id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/background_sample"
+            android:src="@drawable/background_city"
             />
 
     <LinearLayout

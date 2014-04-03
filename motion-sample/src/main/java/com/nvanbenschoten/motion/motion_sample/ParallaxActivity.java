@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
@@ -34,6 +37,8 @@ public class ParallaxActivity extends ActionBarActivity {
 
         private ParallaxImageView mBackground;
         private SeekBar mSeekBar;
+
+        private int mCurrentImage;
 
         public ParallaxFragment() { }
 
@@ -80,7 +85,7 @@ public class ParallaxActivity extends ActionBarActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) { }
             });
-            mSeekBar.setProgress(5);
+            mSeekBar.setProgress(1);
         }
 
         @Override
@@ -95,5 +100,28 @@ public class ParallaxActivity extends ActionBarActivity {
             mBackground.unregisterSensorManager();
         }
 
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            super.onCreateOptionsMenu(menu, inflater);
+            inflater.inflate(R.menu.parallax, menu);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_switch:
+                    if (mCurrentImage == 0) {
+                        mBackground.setImageResource(R.drawable.background_ski);
+                        mCurrentImage = 1;
+                    } else {
+                        mBackground.setImageResource(R.drawable.background_city);
+                        mCurrentImage = 0;
+                    }
+                    return true;
+
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
     }
 }

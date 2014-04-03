@@ -92,7 +92,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param parallaxIntensity the new intensity
      */
     public void setParallaxIntensity(float parallaxIntensity) {
-        if (parallaxIntensity <= 1)
+        if (parallaxIntensity < 1)
             throw new IllegalArgumentException("Parallax effect must have a intensity of 1.0 or greater");
 
         mParallaxIntensity = parallaxIntensity;
