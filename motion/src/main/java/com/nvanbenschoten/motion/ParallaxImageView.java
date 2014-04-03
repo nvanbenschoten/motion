@@ -90,7 +90,8 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param intensity the new tilt intensity
      */
     public void setIntensity(float intensity) {
-        if (intensity <= 1) return;
+        if (intensity <= 1)
+            throw new IllegalArgumentException("Parallax effect must have an intensity of 1.0 or greater");
 
         mIntensity = intensity;
         configureMatrix();
@@ -114,7 +115,9 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param tiltForwardAdjustment the new tilt forward adjustment
      */
     public void setTiltForwardAdjustment(float tiltForwardAdjustment) {
-        if (Math.abs(tiltForwardAdjustment) > 1) return;
+        if (Math.abs(tiltForwardAdjustment) > 1)
+            throw new IllegalArgumentException("Parallax tilt adjustment must be less than or equal to 1.0");
+
         mTiltForwardAdjustment = tiltForwardAdjustment;
     }
 
@@ -126,7 +129,8 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param y the vertical translation
      */
     private void setTranslate(float x, float y) {
-        if (Math.abs(x) > 1 || Math.abs(y) > 1) return;
+        if (Math.abs(x) > 1 || Math.abs(y) > 1)
+            throw new IllegalArgumentException("Parallax effect cannot translate more than 100% of its off-screen size");
 
         mXTranslation = x * mXOffset;
         mYTranslation = y * mYOffset;
@@ -188,6 +192,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      */
     public void unregisterSensorManager() {
         if (mSensorManager == null) return;
+
         mSensorManager.unregisterListener(this);
         mSensorManager = null;
     }
