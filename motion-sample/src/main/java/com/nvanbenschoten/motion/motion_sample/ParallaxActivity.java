@@ -1,5 +1,7 @@
 package com.nvanbenschoten.motion.motion_sample;
 
+import android.content.Context;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -75,6 +77,18 @@ public class ParallaxActivity extends ActionBarActivity {
             };
 
             new Handler().postDelayed(mRunnable, 2000);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            mBackground.registerSensorManager((SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE));
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            mBackground.unregisterSensorManager();
         }
 
         @Override

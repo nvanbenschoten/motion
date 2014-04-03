@@ -2,6 +2,10 @@ package com.nvanbenschoten.motion;
 
 import android.content.Context;
 import android.graphics.Matrix;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -20,8 +24,13 @@ import android.widget.ImageView;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class ParallaxImageView extends ImageView {
+public class ParallaxImageView extends ImageView implements SensorEventListener {
 
+    private static final String TAG = ParallaxImageView.class.getName();
+
+    private SensorManager mSensorManager;
+
+    private Matrix mTranslationMatrix;
     private float mIntensity = 1f;
     private float mXTranslation = 0;
     private float mYTranslation = 0;
@@ -44,7 +53,11 @@ public class ParallaxImageView extends ImageView {
     }
 
     private void init() {
+        // Sets scale type
         setScaleType(ScaleType.MATRIX);
+
+        // Instantiate future objects
+        mTranslationMatrix = new Matrix();
     }
 
     public void setIntensity(float intensity) {
@@ -78,11 +91,10 @@ public class ParallaxImageView extends ImageView {
         dx = mXOffset + mXTranslation;
         dy = mYOffset + mYTranslation;
 
-        Matrix matrix = new Matrix();
-        matrix.set(getImageMatrix());
-        matrix.setScale(mIntensity * scale, mIntensity * scale);
-        matrix.postTranslate(dx, dy);
-        setImageMatrix(matrix);
+        mTranslationMatrix.set(getImageMatrix());
+        mTranslationMatrix.setScale(mIntensity * scale, mIntensity * scale);
+        mTranslationMatrix.postTranslate(dx, dy);
+        setImageMatrix(mTranslationMatrix);
     }
 
     public void setTranslate(float x, float y) {
@@ -99,4 +111,40 @@ public class ParallaxImageView extends ImageView {
         configureMatrix();
     }
 
+    public void registerSensorManager(SensorManager sensorManager) {
+        mSensorManager = sensorManager;
+        mSensorManager.registerListener(this,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
+                SensorManager.SENSOR_DELAY_FASTEST);
+    }
+
+    public void unregisterSensorManager() {
+        mSensorManager.unregisterListener(this);
+        mSensorManager = null;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.values[4] == -1) return;
+
+        if (event.values[0] == 0 || event.values[1] == 0) return;
+
+        event.values[0] -= .25;
+        if (event.values[0] < -1) event.values[0] += 2;
+
+        event.values[0] *= 2f;
+        if (event.values[0] > 1) event.values[0] = 1f;
+        if (event.values[0] < -1) event.values[0] = -1f;
+
+        event.values[1] *= 2f;
+        if (event.values[1] > 1) event.values[1] = 1f;
+        if (event.values[1] < -1) event.values[1] = -1f;
+
+        setTranslate(event.values[1], event.values[0]);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }
