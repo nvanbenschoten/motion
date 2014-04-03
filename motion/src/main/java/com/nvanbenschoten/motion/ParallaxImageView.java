@@ -46,8 +46,8 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     // Instance variables used during matrix manipulation.
     private SensorManager mSensorManager;
     private Matrix mTranslationMatrix;
-    private float mXTranslation = 0;
-    private float mYTranslation = 0;
+    private float mXTranslation;
+    private float mYTranslation;
     private float mXOffset;
     private float mYOffset;
 
