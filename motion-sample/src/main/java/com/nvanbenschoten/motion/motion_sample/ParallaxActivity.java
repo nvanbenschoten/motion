@@ -59,6 +59,9 @@ public class ParallaxActivity extends ActionBarActivity {
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
 
+            // Adjusts the Parallax tilt sensitivity
+            mBackground.setTiltSensitivity(2.2f);
+
             // Set SeekBar to change parallax intensity
             mSeekBar.setMax(10);
             mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

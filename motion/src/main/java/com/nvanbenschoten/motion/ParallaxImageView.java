@@ -28,12 +28,23 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
     private static final String TAG = ParallaxImageView.class.getName();
 
-    private SensorManager mSensorManager;
-
+    /**
+     * The intensity of the parallax effect, giving the perspective of depth.
+     */
     private float mIntensity = 1f;
+
+    /**
+     * The sensitivity the parallax effect has towards tilting.
+     */
     private float mTiltSensitivity = 2.5f;
+
+    /**
+     * The forward tilt offset adjustment to counteract a natural forward phone tilt.
+     */
     private float mTiltForwardAdjustment = .3f;
 
+    // Instance variables used during matrix manipulation.
+    private SensorManager mSensorManager;
     private Matrix mTranslationMatrix;
     private float mXTranslation = 0;
     private float mYTranslation = 0;
@@ -55,6 +66,9 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         init();
     }
 
+    /**
+     * Initiates the ParallaxImageView with any given attributes.
+     */
     private void init() {
         // Sets scale type
         setScaleType(ScaleType.MATRIX);
@@ -63,6 +77,18 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         mTranslationMatrix = new Matrix();
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        configureMatrix();
+    }
+
+    /**
+     * Sets the intensity of the parallax effect. The stronger the effect, the more distance
+     * the image will have to move around.
+     *
+     * @param intensity the new tilt intensity
+     */
     public void setIntensity(float intensity) {
         if (intensity <= 1) return;
 
@@ -70,10 +96,48 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         configureMatrix();
     }
 
+    /**
+     * Sets the parallax tilt sensitivity for the image view. The stronger the sensitivity,
+     * the more a given tilt will adjust the image and the smaller needed tilt to reach the
+     * image bounds.
+     *
+     * @param sensitivity the new tilt sensitivity
+     */
     public void setTiltSensitivity(float sensitivity) {
         mTiltSensitivity = sensitivity;
     }
 
+    /**
+     * Sets the tile forward adjustment dimension, allowing for the image to be
+     * centered while the phone is "naturally" tilted forwards.
+     *
+     * @param tiltForwardAdjustment the new tilt forward adjustment
+     */
+    public void setTiltForwardAdjustment(float tiltForwardAdjustment) {
+        if (Math.abs(tiltForwardAdjustment) > 1) return;
+        mTiltForwardAdjustment = tiltForwardAdjustment;
+    }
+
+    /**
+     * Sets the image view's translation coordinates. These values must be between -1 and 1,
+     * representing the transaction percentage from the center.
+     *
+     * @param x the horizontal translation
+     * @param y the vertical translation
+     */
+    private void setTranslate(float x, float y) {
+        if (Math.abs(x) > 1 || Math.abs(y) > 1) return;
+
+        mXTranslation = x * mXOffset;
+        mYTranslation = y * mYOffset;
+
+        configureMatrix();
+    }
+
+    /**
+     * Configures the ImageView's imageMatrix to allow for movement of the
+     * source image.
+     */
     private void configureMatrix() {
         if (getDrawable() == null || getWidth() == 0 || getHeight() == 0) return;
 
@@ -104,20 +168,12 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         setImageMatrix(mTranslationMatrix);
     }
 
-    public void setTranslate(float x, float y) {
-        if (Math.abs(x) > 1 || Math.abs(y) > 1) return;
-
-        mXTranslation = x * mXOffset;
-        mYTranslation = y * mYOffset;
-        configureMatrix();
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        configureMatrix();
-    }
-
+    /**
+     * Registers a sensor manager with the parallax ImageView. Should be called in onResume
+     * from an Activity or Fragment.
+     *
+     * @param sensorManager a SensorManager instance.
+     */
     @SuppressWarnings("deprecation")
     public void registerSensorManager(SensorManager sensorManager) {
         mSensorManager = sensorManager;
@@ -126,7 +182,12 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
                 SensorManager.SENSOR_DELAY_FASTEST);
     }
 
+    /**
+     * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause from
+     * an Activity or Fragment to avoid continuing sensor usage.
+     */
     public void unregisterSensorManager() {
+        if (mSensorManager == null) return;
         mSensorManager.unregisterListener(this);
         mSensorManager = null;
     }
@@ -153,8 +214,6 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
 }
