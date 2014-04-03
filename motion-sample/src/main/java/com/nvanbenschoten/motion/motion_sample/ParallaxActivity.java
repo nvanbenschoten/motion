@@ -56,6 +56,7 @@ public class ParallaxActivity extends ActionBarActivity {
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
+            mBackground.setIntensity(1.2f);
         }
 
         @Override

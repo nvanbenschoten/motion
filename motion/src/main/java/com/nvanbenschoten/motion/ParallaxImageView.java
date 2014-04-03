@@ -22,9 +22,9 @@ import android.widget.ImageView;
  */
 public class ParallaxImageView extends ImageView {
 
-    private float mIntensity;
-    private int mXTranslation;
-    private int mYTranslation;
+    private float mIntensity = 1f;
+    private int mXTranslation = 0;
+    private int mYTranslation = 0;
 
     public ParallaxImageView(Context context) {
         super(context);
@@ -53,7 +53,8 @@ public class ParallaxImageView extends ImageView {
     }
 
     private void configureMatrix() {
-        if (getDrawable() == null) return;
+        if (getDrawable() == null || getWidth() == 0 || getHeight() == 0) return;
+
         int dWidth = getDrawable().getIntrinsicWidth();
         int dHeight = getDrawable().getIntrinsicHeight();
         int vWidth = getWidth();
@@ -70,14 +71,25 @@ public class ParallaxImageView extends ImageView {
             dy = (vHeight - dHeight * scale * mIntensity) * 0.5f;
         }
 
-        float xTranslate = dx + mXTranslation;
-        float yTranslate = dy + mYTranslation;
+        float xTranslation = dx + mXTranslation;
+        if (xTranslation > 0) xTranslation = 0;
+        if (xTranslation < vWidth - dWidth) xTranslation = dWidth - vWidth;
+
+        float yTranslation = dy + mYTranslation;
+        if (yTranslation > 0) yTranslation = 0;
+        if (yTranslation < vHeight - dHeight) yTranslation = dHeight - vHeight;
 
         Matrix matrix = new Matrix();
         matrix.set(getImageMatrix());
         matrix.setScale(mIntensity * scale, mIntensity * scale);
-        matrix.postTranslate(dx + mXTranslation, dy + mYTranslation);
+        matrix.postTranslate(xTranslation, yTranslation);
         setImageMatrix(matrix);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        configureMatrix();
     }
 
 }
