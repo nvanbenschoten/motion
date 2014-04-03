@@ -3,19 +3,13 @@ package com.nvanbenschoten.motion.motion_sample;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
-
-import java.util.Random;
 
 
 public class ParallaxActivity extends ActionBarActivity {
@@ -37,7 +31,6 @@ public class ParallaxActivity extends ActionBarActivity {
     public static class ParallaxFragment extends Fragment {
 
         private ParallaxImageView mBackground;
-        private Runnable mRunnable;
 
         public ParallaxFragment() { }
 
@@ -62,21 +55,7 @@ public class ParallaxActivity extends ActionBarActivity {
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-            mBackground.setIntensity(1.5f);
-
-            mRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    Random r = new Random();
-                    float x = r.nextInt(2) == 0 ? -1 : 1;
-                    float y = r.nextInt(2) == 0 ? -1 : 1;
-
-                    mBackground.setTranslate(0, 0);
-                    new Handler().postDelayed(mRunnable, 2000);
-                }
-            };
-
-            new Handler().postDelayed(mRunnable, 2000);
+            mBackground.setIntensity(1.3f);
         }
 
         @Override
@@ -91,22 +70,5 @@ public class ParallaxActivity extends ActionBarActivity {
             mBackground.unregisterSensorManager();
         }
 
-        @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            super.onCreateOptionsMenu(menu, inflater);
-            inflater.inflate(R.menu.parallax, menu);
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_settings:
-                    mBackground.setIntensity(1.1f);
-                    return true;
-
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        }
     }
 }
