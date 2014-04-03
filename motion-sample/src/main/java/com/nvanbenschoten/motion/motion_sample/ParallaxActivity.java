@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
 
@@ -31,6 +32,7 @@ public class ParallaxActivity extends ActionBarActivity {
     public static class ParallaxFragment extends Fragment {
 
         private ParallaxImageView mBackground;
+        private SeekBar mSeekBar;
 
         public ParallaxFragment() { }
 
@@ -48,6 +50,7 @@ public class ParallaxActivity extends ActionBarActivity {
             if (rootView == null) return null;
 
             mBackground = (ParallaxImageView) rootView.findViewById(android.R.id.background);
+            mSeekBar = (SeekBar) rootView.findViewById(android.R.id.progress);
 
             return rootView;
         }
@@ -55,7 +58,22 @@ public class ParallaxActivity extends ActionBarActivity {
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-            mBackground.setIntensity(1.3f);
+
+            // Set SeekBar to change parallax intensity
+            mSeekBar.setMax(10);
+            mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    mBackground.setIntensity(1f + ((float)progress)/10);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) { }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) { }
+            });
+            mSeekBar.setProgress(5);
         }
 
         @Override

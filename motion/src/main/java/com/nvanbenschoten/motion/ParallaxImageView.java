@@ -30,8 +30,11 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
     private SensorManager mSensorManager;
 
-    private Matrix mTranslationMatrix;
     private float mIntensity = 1f;
+    private float mTiltSensitivity = 2.5f;
+    private float mTiltForwardAdjustment = .3f;
+
+    private Matrix mTranslationMatrix;
     private float mXTranslation = 0;
     private float mYTranslation = 0;
     private float mXOffset;
@@ -61,10 +64,14 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     }
 
     public void setIntensity(float intensity) {
-        if (intensity <= 0) return;
+        if (intensity <= 1) return;
 
         mIntensity = intensity;
         configureMatrix();
+    }
+
+    public void setTiltSensitivity(float sensitivity) {
+        mTiltSensitivity = sensitivity;
     }
 
     private void configureMatrix() {
@@ -111,10 +118,11 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         configureMatrix();
     }
 
+    @SuppressWarnings("deprecation")
     public void registerSensorManager(SensorManager sensorManager) {
         mSensorManager = sensorManager;
         mSensorManager.registerListener(this,
-                mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
                 SensorManager.SENSOR_DELAY_FASTEST);
     }
 
@@ -125,26 +133,28 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[4] == -1) return;
-
         if (event.values[0] == 0 || event.values[1] == 0) return;
 
-        event.values[0] -= .25;
-        if (event.values[0] < -1) event.values[0] += 2;
+        event.values[1] /= 90f;
+        event.values[2] /= 90f;
 
-        event.values[0] *= 2f;
-        if (event.values[0] > 1) event.values[0] = 1f;
-        if (event.values[0] < -1) event.values[0] = -1f;
+        event.values[1] += mTiltForwardAdjustment;
+        if (event.values[1] > 1) event.values[1] -= 2;
 
-        event.values[1] *= 2f;
+        event.values[1] *= mTiltSensitivity;
         if (event.values[1] > 1) event.values[1] = 1f;
         if (event.values[1] < -1) event.values[1] = -1f;
 
-        setTranslate(event.values[1], event.values[0]);
+        event.values[2] *= mTiltSensitivity;
+        if (event.values[2] > 1) event.values[2] = 1f;
+        if (event.values[2] < -1) event.values[2] = -1f;
+
+        setTranslate(-event.values[2], -event.values[1]);
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
 }
