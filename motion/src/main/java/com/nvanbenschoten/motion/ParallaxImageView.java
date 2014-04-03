@@ -7,6 +7,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.AttributeSet;
+import android.view.Surface;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 /*
@@ -201,21 +203,67 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     public void onSensorChanged(SensorEvent event) {
         if (event.values[0] == 0 || event.values[1] == 0) return;
 
+        // Set degrees to a percent out of 1.0
         event.values[1] /= 90f;
         event.values[2] /= 90f;
 
-        event.values[1] += mTiltForwardAdjustment;
-        if (event.values[1] > 1) event.values[1] -= 2;
+        // Get the current screen rotation
+        if (getContext() == null) return;
+        final int rotation = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay().getRotation();
 
+        // Adjust for forward tilt based on screen orientation
+        switch (rotation) {
+            case Surface.ROTATION_90:
+                event.values[2] -= mTiltForwardAdjustment;
+                if (event.values[2] < -1) event.values[2] += 2;
+                break;
+
+            case Surface.ROTATION_180:
+                event.values[1] -= mTiltForwardAdjustment;
+                if (event.values[1] < -1) event.values[1] += 2;
+                break;
+
+            case Surface.ROTATION_270:
+                event.values[2] += mTiltForwardAdjustment;
+                if (event.values[2] > 1) event.values[2] -= 2;
+                break;
+
+            default:
+                event.values[1] += mTiltForwardAdjustment;
+                if (event.values[1] > 1) event.values[1] -= 2;
+                break;
+        }
+
+        // Adjust for tile sensitivity
         event.values[1] *= mTiltSensitivity;
+        event.values[2] *= mTiltSensitivity;
+
+        // Clamp values to image bounds
         if (event.values[1] > 1) event.values[1] = 1f;
         if (event.values[1] < -1) event.values[1] = -1f;
 
-        event.values[2] *= mTiltSensitivity;
         if (event.values[2] > 1) event.values[2] = 1f;
         if (event.values[2] < -1) event.values[2] = -1f;
 
-        setTranslate(-event.values[2], -event.values[1]);
+        // Set translation based on screen orientation
+        switch (rotation) {
+            case Surface.ROTATION_90:
+                setTranslate(-event.values[1], event.values[2]);
+                break;
+
+            case Surface.ROTATION_180:
+                setTranslate(event.values[1], event.values[2]);
+                break;
+
+            case Surface.ROTATION_270:
+                setTranslate(event.values[1], -event.values[2]);
+                break;
+
+            default:
+                setTranslate(-event.values[2], -event.values[1]);
+                break;
+        }
     }
 
     @Override

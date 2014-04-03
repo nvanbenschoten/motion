@@ -10,7 +10,6 @@
         <activity
             android:name="com.nvanbenschoten.motion.motion_sample.ParallaxActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
                 >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
