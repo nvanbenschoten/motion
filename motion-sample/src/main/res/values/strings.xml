@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MotionSample</string>
+    <string name="app_name">Motion</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_parallax">Toggle Parallax</string>
     <string name="action_switch">Switch Image</string>
+    <string name="action_lock_portrait">Lock Portrait</string>
+    <string name="action_unlock_portrait">Unlock Portrait</string>
 
 </resources>

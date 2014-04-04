@@ -1,17 +1,22 @@
 package com.nvanbenschoten.motion.motion_sample;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.graphics.BitmapFactory;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 
 import com.nvanbenschoten.motion.ParallaxImageView;
 
@@ -39,6 +44,8 @@ public class ParallaxActivity extends ActionBarActivity {
         private SeekBar mSeekBar;
 
         private int mCurrentImage;
+        private boolean mParallaxSet;
+        private boolean mPortraitLock;
 
         public ParallaxFragment() { }
 
@@ -47,6 +54,9 @@ public class ParallaxActivity extends ActionBarActivity {
             super.onCreate(savedInstanceState);
             setRetainInstance(true);
             setHasOptionsMenu(true);
+
+            mParallaxSet = true;
+            mPortraitLock = false;
         }
 
         @Override
@@ -58,15 +68,14 @@ public class ParallaxActivity extends ActionBarActivity {
             mBackground = (ParallaxImageView) rootView.findViewById(android.R.id.background);
             mSeekBar = (SeekBar) rootView.findViewById(android.R.id.progress);
 
+            setCurrentImage();
+
             return rootView;
         }
 
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
-
-            // Adjusts the Parallax tilt sensitivity
-            mBackground.setTiltSensitivity(2.3f);
 
             // Adjust the Parallax forward tilt adjustment
             mBackground.setForwardTiltOffset(.35f);
@@ -85,12 +94,13 @@ public class ParallaxActivity extends ActionBarActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) { }
             });
-            mSeekBar.setProgress(1);
+            mSeekBar.setProgress(2);
         }
 
         @Override
         public void onResume() {
             super.onResume();
+
             mBackground.registerSensorManager((SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE));
         }
 
@@ -104,23 +114,68 @@ public class ParallaxActivity extends ActionBarActivity {
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             super.onCreateOptionsMenu(menu, inflater);
             inflater.inflate(R.menu.parallax, menu);
+
+            // Add parallax toggle
+            final Switch mParallaxToggle = new Switch(getActivity());
+            mParallaxToggle.setPadding(0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics()), 0);
+            mParallaxToggle.setChecked(mParallaxSet);
+            mParallaxToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        mBackground.registerSensorManager((SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE));
+                    } else {
+                        mBackground.unregisterSensorManager();
+                    }
+
+                    mParallaxSet = isChecked;
+                }
+            });
+            MenuItem switchItem = menu.findItem(R.id.action_parallax);
+            if (switchItem != null)
+                switchItem.setActionView(mParallaxToggle);
+
+            // Set lock/ unlock orientation text
+            if (!mPortraitLock) {
+                MenuItem orientationItem = menu.findItem(R.id.action_portrait);
+                if (orientationItem != null)
+                    orientationItem.setTitle(R.string.action_unlock_portrait);
+            }
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_switch:
-                    if (mCurrentImage == 0) {
-                        mBackground.setImageResource(R.drawable.background_ski);
-                        mCurrentImage = 1;
+                    mCurrentImage ++;
+                    mCurrentImage %= 3;
+                    setCurrentImage();
+                    return true;
+
+                case R.id.action_portrait:
+                    if (mPortraitLock) {
+                        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                        item.setTitle(getString(R.string.action_lock_portrait));
                     } else {
-                        mBackground.setImageResource(R.drawable.background_city);
-                        mCurrentImage = 0;
+                        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        item.setTitle(getString(R.string.action_unlock_portrait));
                     }
+
+                    mPortraitLock = !mPortraitLock;
                     return true;
 
                 default:
                     return super.onOptionsItemSelected(item);
+            }
+        }
+
+        private void setCurrentImage() {
+            if (mCurrentImage == 0) {
+                mBackground.setImageResource(R.drawable.background_ski);
+            } else if (mCurrentImage == 1) {
+                mBackground.setImageDrawable(getResources().getDrawable(R.drawable.background_city));
+            } else {
+                mBackground.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background_rocket_small));
             }
         }
     }

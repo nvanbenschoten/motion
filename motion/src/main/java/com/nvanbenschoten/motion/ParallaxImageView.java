@@ -1,6 +1,7 @@
 package com.nvanbenschoten.motion;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -55,23 +56,41 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
     public ParallaxImageView(Context context) {
         super(context);
-        init();
+        init(context, null);
     }
 
     public ParallaxImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs);
     }
 
     public ParallaxImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init();
+        init(context, attrs);
     }
 
     /**
      * Initiates the ParallaxImageView with any given attributes.
      */
-    private void init() {
+    private void init(Context context, AttributeSet attrs) {
+        // Set available attributes
+        if (attrs != null) {
+            final TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.ParallaxImageView);
+
+            if (customAttrs != null) {
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_intensity))
+                    setParallaxIntensity(customAttrs.getFloat(R.styleable.ParallaxImageView_intensity, mParallaxIntensity));
+
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_tiltSensitivity))
+                    setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_tiltSensitivity, mTiltSensitivity));
+
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_forwardTiltOffset))
+                    setForwardTiltOffset(customAttrs.getFloat(R.styleable.ParallaxImageView_forwardTiltOffset, mForwardTiltOffset));
+
+                customAttrs.recycle();
+            }
+        }
+
         // Sets scale type
         setScaleType(ScaleType.MATRIX);
 
@@ -197,11 +216,13 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
         mSensorManager.unregisterListener(this);
         mSensorManager = null;
+
+        setTranslate(0, 0);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[0] == 0 || event.values[1] == 0) return;
+        if (event.values[1] == 0 || event.values[2] == 0) return;
 
         // Set degrees to a percent out of 1.0
         event.values[1] /= 90f;
@@ -209,8 +230,10 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
         // Get the current screen rotation
         if (getContext() == null) return;
-        final int rotation = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
-                .getDefaultDisplay().getRotation();
+        final int rotation = ((WindowManager) getContext()
+                .getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay()
+                .getRotation();
 
         // Adjust for forward tilt based on screen orientation
         switch (rotation) {
