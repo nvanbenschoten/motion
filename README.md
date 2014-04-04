@@ -1,9 +1,14 @@
 Motion
 ======
 
-Android library allowing images to exhibit a parallax effect.
+An Android library allowing images to exhibit a parallax effect. By replacing static pictures
+and backgrounds with a fluid images that reacts to screen tilt and orientation, Android
+applications can add a perceived depth and layering to their content. Motion works great for
+both full screen background images and smaller sized pictures to give users a whole new
+perspective on how they interact with their phone. This project was inspired in part by
+iOS 7's new parallax effect.
 
-![Parallax](motionImage.png)
+![Parallax on Android](motionImage.png)
 
 Usage
 -----
@@ -38,7 +43,7 @@ Configurations
 --------------
 
 There are three attributes that can be changed to adjust the parallax effect of the ImageView.
-Each can be accessed either through xml attributes or through Java functions.
+Each can be accessed either through XML attributes or through Java functions.
 
 * parallaxIntensity - adjusts the strength of the parallax effect, giving control over the
 perceived depth of the view.
