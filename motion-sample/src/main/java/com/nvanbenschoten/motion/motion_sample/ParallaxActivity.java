@@ -82,7 +82,7 @@ public class ParallaxActivity extends ActionBarActivity {
             mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    mBackground.setParallaxIntensity(1f + ((float) progress) / 20);
+                    mBackground.setParallaxIntensity(1f + ((float) progress) / 40);
                 }
 
                 @Override
