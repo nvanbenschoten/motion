@@ -44,8 +44,8 @@ public class ParallaxActivity extends ActionBarActivity {
         private SeekBar mSeekBar;
 
         private int mCurrentImage;
-        private boolean mParallaxSet;
-        private boolean mPortraitLock;
+        private boolean mParallaxSet = true;
+        private boolean mPortraitLock = false;
 
         public ParallaxFragment() { }
 
@@ -54,9 +54,6 @@ public class ParallaxActivity extends ActionBarActivity {
             super.onCreate(savedInstanceState);
             setRetainInstance(true);
             setHasOptionsMenu(true);
-
-            mParallaxSet = true;
-            mPortraitLock = false;
         }
 
         @Override
@@ -94,14 +91,15 @@ public class ParallaxActivity extends ActionBarActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) { }
             });
-            mSeekBar.setProgress(2);
+            mSeekBar.setProgress(1);
         }
 
         @Override
         public void onResume() {
             super.onResume();
 
-            mBackground.registerSensorManager((SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE));
+            if (mParallaxSet)
+                mBackground.registerSensorManager((SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE));
         }
 
         @Override
@@ -136,7 +134,7 @@ public class ParallaxActivity extends ActionBarActivity {
                 switchItem.setActionView(mParallaxToggle);
 
             // Set lock/ unlock orientation text
-            if (!mPortraitLock) {
+            if (mPortraitLock) {
                 MenuItem orientationItem = menu.findItem(R.id.action_portrait);
                 if (orientationItem != null)
                     orientationItem.setTitle(R.string.action_unlock_portrait);
@@ -171,7 +169,7 @@ public class ParallaxActivity extends ActionBarActivity {
 
         private void setCurrentImage() {
             if (mCurrentImage == 0) {
-                mBackground.setImageResource(R.drawable.background_ski);
+                mBackground.setImageResource(R.drawable.background_pond);
             } else if (mCurrentImage == 1) {
                 mBackground.setImageDrawable(getResources().getDrawable(R.drawable.background_city));
             } else {
