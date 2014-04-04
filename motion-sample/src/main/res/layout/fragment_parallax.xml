@@ -9,7 +9,7 @@
         android:id="@android:id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        parallax:tiltSensitivity="2.25"
+        parallax:tiltSensitivity="2.5"
         />
 
     <LinearLayout

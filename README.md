@@ -3,6 +3,8 @@ Motion
 
 Android library allowing images to exhibit a parallax effect
 
+![Screenshot](motionImage.png)
+
 License
 -------
 

@@ -34,12 +34,12 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     /**
      * The intensity of the parallax effect, giving the perspective of depth.
      */
-    private float mParallaxIntensity = 1.0f;
+    private float mParallaxIntensity = 1.1f;
 
     /**
      * The sensitivity the parallax effect has towards tilting.
      */
-    private float mTiltSensitivity = 2.0f;
+    private float mTiltSensitivity = 2.5f;
 
     /**
      * The forward tilt offset adjustment to counteract a natural forward phone tilt.
