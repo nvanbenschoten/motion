@@ -10,6 +10,12 @@ iOS 7's new parallax effect.
 
 ![Parallax on Android](motionImage.png)
 
+Demo
+----
+
+Feel free to download the [demo](https://github.com/nvanbenschoten/motion/releases) to try
+out motion.
+
 Usage
 -----
 
