@@ -8,8 +8,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.AttributeSet;
-import android.view.Surface;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 /*
@@ -36,17 +34,8 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      */
     private float mParallaxIntensity = 1.1f;
 
-    /**
-     * The sensitivity the parallax effect has towards tilting.
-     */
-    private float mTiltSensitivity = 2.5f;
-
-    /**
-     * The forward tilt offset adjustment to counteract a natural forward phone tilt.
-     */
-    private float mForwardTiltOffset = 0.3f;
-
     // Instance variables used during matrix manipulation.
+    private SensorInterpreter mSensorInterpreter;
     private SensorManager mSensorManager;
     private Matrix mTranslationMatrix;
     private float mXTranslation;
@@ -73,6 +62,13 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * Initiates the ParallaxImageView with any given attributes.
      */
     private void init(Context context, AttributeSet attrs) {
+        // Instantiate future objects
+        mTranslationMatrix = new Matrix();
+        mSensorInterpreter = new SensorInterpreter();
+
+        // Sets scale type
+        setScaleType(ScaleType.MATRIX);
+
         // Set available attributes
         if (attrs != null) {
             final TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.ParallaxImageView);
@@ -82,20 +78,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
                     setParallaxIntensity(customAttrs.getFloat(R.styleable.ParallaxImageView_intensity, mParallaxIntensity));
 
                 if (customAttrs.hasValue(R.styleable.ParallaxImageView_tiltSensitivity))
-                    setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_tiltSensitivity, mTiltSensitivity));
+                    setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_tiltSensitivity,
+                            mSensorInterpreter.getTiltSensitivity()));
 
                 if (customAttrs.hasValue(R.styleable.ParallaxImageView_forwardTiltOffset))
-                    setForwardTiltOffset(customAttrs.getFloat(R.styleable.ParallaxImageView_forwardTiltOffset, mForwardTiltOffset));
+                    setForwardTiltOffset(customAttrs.getFloat(R.styleable.ParallaxImageView_forwardTiltOffset,
+                            mSensorInterpreter.getForwardTiltOffset()));
 
                 customAttrs.recycle();
             }
         }
-
-        // Sets scale type
-        setScaleType(ScaleType.MATRIX);
-
-        // Instantiate future objects
-        mTranslationMatrix = new Matrix();
     }
 
     @Override
@@ -126,7 +118,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param sensitivity the new tilt sensitivity
      */
     public void setTiltSensitivity(float sensitivity) {
-        mTiltSensitivity = sensitivity;
+        mSensorInterpreter.setTiltSensitivity(sensitivity);
     }
 
     /**
@@ -139,7 +131,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         if (Math.abs(forwardTiltOffset) > 1)
             throw new IllegalArgumentException("Parallax forward tilt offset must be less than or equal to 1.0");
 
-        mForwardTiltOffset = forwardTiltOffset;
+        mSensorInterpreter.setForwardTiltOffset(forwardTiltOffset);
     }
 
     /**
@@ -172,7 +164,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         int vHeight = getHeight();
 
         float scale;
-        float dx = 0, dy = 0;
+        float dx, dy;
 
         if (dWidth * vHeight > vWidth * dHeight) {
             scale = (float) vHeight / (float) dHeight;
@@ -197,14 +189,19 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * Registers a sensor manager with the parallax ImageView. Should be called in onResume
      * from an Activity or Fragment.
      *
-     * @param sensorManager a SensorManager instance.
      */
     @SuppressWarnings("deprecation")
-    public void registerSensorManager(SensorManager sensorManager) {
-        mSensorManager = sensorManager;
-        mSensorManager.registerListener(this,
-                mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-                SensorManager.SENSOR_DELAY_FASTEST);
+    public void registerSensorManager() {
+        if (getContext() == null || mSensorManager != null) return;
+
+        // Acquires a sensor manager
+        mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+
+        if (mSensorManager != null) {
+            mSensorManager.registerListener(this,
+                    mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                    SensorManager.SENSOR_DELAY_FASTEST);
+        }
     }
 
     /**
@@ -222,71 +219,13 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[1] == 0 || event.values[2] == 0) return;
+        final float [] vectors = mSensorInterpreter.interpretSensorEvent(getContext(), event);
 
-        // Set degrees to a percent out of 1.0
-        event.values[1] /= 90f;
-        event.values[2] /= 90f;
+        // Return if interpretation of data failed
+        if (vectors == null) return;
 
-        // Get the current screen rotation
-        if (getContext() == null) return;
-        final int rotation = ((WindowManager) getContext()
-                .getSystemService(Context.WINDOW_SERVICE))
-                .getDefaultDisplay()
-                .getRotation();
-
-        // Adjust for forward tilt based on screen orientation
-        switch (rotation) {
-            case Surface.ROTATION_90:
-                event.values[2] -= mForwardTiltOffset;
-                if (event.values[2] < -1) event.values[2] += 2;
-                break;
-
-            case Surface.ROTATION_180:
-                event.values[1] -= mForwardTiltOffset;
-                if (event.values[1] < -1) event.values[1] += 2;
-                break;
-
-            case Surface.ROTATION_270:
-                event.values[2] += mForwardTiltOffset;
-                if (event.values[2] > 1) event.values[2] -= 2;
-                break;
-
-            default:
-                event.values[1] += mForwardTiltOffset;
-                if (event.values[1] > 1) event.values[1] -= 2;
-                break;
-        }
-
-        // Adjust for tile sensitivity
-        event.values[1] *= mTiltSensitivity;
-        event.values[2] *= mTiltSensitivity;
-
-        // Clamp values to image bounds
-        if (event.values[1] > 1) event.values[1] = 1f;
-        if (event.values[1] < -1) event.values[1] = -1f;
-
-        if (event.values[2] > 1) event.values[2] = 1f;
-        if (event.values[2] < -1) event.values[2] = -1f;
-
-        // Set translation based on screen orientation
-        switch (rotation) {
-            case Surface.ROTATION_90:
-                setTranslate(-event.values[1], event.values[2]);
-                break;
-
-            case Surface.ROTATION_180:
-                setTranslate(event.values[1], event.values[2]);
-                break;
-
-            case Surface.ROTATION_270:
-                setTranslate(event.values[1], -event.values[2]);
-                break;
-
-            default:
-                setTranslate(-event.values[2], -event.values[1]);
-                break;
-        }
+        // Set translation on ImageView matrix
+        setTranslate(vectors[2], vectors[1]);
     }
 
     @Override

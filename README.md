@@ -22,7 +22,7 @@ Usage
 To use Motion, simply replace any existing ImageView's with a ParallaxImageView.
 
 Once a reference to this view is acquired, register a SensorManager with the
-ParallaxImageView using the `registerSensorManager(SensorManager)` call. This registration
+ParallaxImageView using the `registerSensorManager()` call. This registration
 is most commonly done in the `onResume` method of an `Activity/Fragment`, but can be
 completed whenever the parallax effect is desired to begin.
 
@@ -37,7 +37,7 @@ As an example
 ParallaxImageView mBackground = findViewById(R.id.background);
 
 // Register a SensorManager to begin effect
-mBackground.registerSensorManager((SensorManager) getSystemService(Context.SENSOR_SERVICE));
+mBackground.registerSensorManager();
 
 ...
 
