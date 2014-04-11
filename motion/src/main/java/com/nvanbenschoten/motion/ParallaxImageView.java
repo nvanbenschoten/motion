@@ -88,6 +88,14 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
                 customAttrs.recycle();
             }
         }
+
+        // Configure matrix as early as possible by posting to MessageQueue
+        post(new Runnable() {
+            @Override
+            public void run() {
+                configureMatrix();
+            }
+        });
     }
 
     @Override

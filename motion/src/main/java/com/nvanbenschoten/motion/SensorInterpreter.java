@@ -77,10 +77,10 @@ public class SensorInterpreter {
         }
 
         // Adjust roll for sensitivity differences based on pitch
-        double tiltScale = 1/Math.cos(mVectors[1] * Math.PI/180);
-        if (tiltScale > 12) tiltScale = 12;
-        if (tiltScale < -12) tiltScale = -12;
-        mVectors[2] *= tiltScale;
+        // double tiltScale = 1/Math.cos(mVectors[1] * Math.PI/180);
+        // if (tiltScale > 12) tiltScale = 12;
+        // if (tiltScale < -12) tiltScale = -12;
+        // mVectors[2] *= tiltScale;
 
         // Make roll and pitch percentages out of 1
         mVectors[1] /= 90;

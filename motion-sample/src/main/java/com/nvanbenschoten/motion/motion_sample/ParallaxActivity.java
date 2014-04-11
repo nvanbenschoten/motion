@@ -147,7 +147,6 @@ public class ParallaxActivity extends ActionBarActivity {
                     mCurrentImage ++;
                     mCurrentImage %= 3;
                     setCurrentImage();
-
                     return true;
 
                 case R.id.action_portrait:
