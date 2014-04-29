@@ -4,5 +4,6 @@
         <attr name="intensity" format="float"/>
         <attr name="tiltSensitivity" format="float"/>
         <attr name="forwardTiltOffset" format="float"/>
+        <attr name="scaledIntensity" format="boolean"/>
     </declare-styleable>
 </resources>

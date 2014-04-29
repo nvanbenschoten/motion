@@ -30,9 +30,18 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     private static final String TAG = ParallaxImageView.class.getName();
 
     /**
+     * If the x and y axis' intensities are scaled to the image's aspect ratio (true) or
+     * equal to the smaller of the axis' intensities (false). If true, the image will be able to
+     * translate up to it's view bounds, independent of aspect ratio. If not true,
+     * the image will limit it's translation equally so that motion in either axis results
+     * in proportional translation.
+     */
+    private boolean mScaledIntensities = false;
+
+    /**
      * The intensity of the parallax effect, giving the perspective of depth.
      */
-    private float mParallaxIntensity = 1.1f;
+    private float mParallaxIntensity = 1.2f;
 
     // Instance variables used during matrix manipulation.
     private SensorInterpreter mSensorInterpreter;
@@ -76,6 +85,9 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
             if (customAttrs != null) {
                 if (customAttrs.hasValue(R.styleable.ParallaxImageView_intensity))
                     setParallaxIntensity(customAttrs.getFloat(R.styleable.ParallaxImageView_intensity, mParallaxIntensity));
+
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_scaledIntensity))
+                    setScaledIntensities(customAttrs.getBoolean(R.styleable.ParallaxImageView_scaledIntensity, mScaledIntensities));
 
                 if (customAttrs.hasValue(R.styleable.ParallaxImageView_tiltSensitivity))
                     setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_tiltSensitivity,
@@ -143,6 +155,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     }
 
     /**
+     * Sets whether translation should be limited to the image's bounds or should be limited
+     * to the smaller of the two axis' translation limits.
+     *
+     * @param scaledIntensities the scaledIntensities flag
+     */
+    public void setScaledIntensities(boolean scaledIntensities) {
+        mScaledIntensities = scaledIntensities;
+    }
+
+    /**
      * Sets the image view's translation coordinates. These values must be between -1 and 1,
      * representing the transaction percentage from the center.
      *
@@ -153,8 +175,20 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         if (Math.abs(x) > 1 || Math.abs(y) > 1)
             throw new IllegalArgumentException("Parallax effect cannot translate more than 100% of its off-screen size");
 
-        mXTranslation = x * mXOffset;
-        mYTranslation = y * mYOffset;
+        float xScale, yScale;
+
+        if (mScaledIntensities) {
+            // Set both scales to their offset values
+            xScale = mXOffset;
+            yScale = mYOffset;
+        } else {
+            // Set both scales to the max offset (should be negative, so smaller absolute value)
+            xScale = Math.max(mXOffset, mYOffset);
+            yScale = Math.max(mXOffset, mYOffset);
+        }
+
+        mXTranslation = x * xScale;
+        mYTranslation = y * yScale;
 
         configureMatrix();
     }

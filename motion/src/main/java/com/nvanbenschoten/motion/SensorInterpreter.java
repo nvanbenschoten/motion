@@ -17,7 +17,7 @@ public class SensorInterpreter {
     /**
      * The sensitivity the parallax effect has towards tilting.
      */
-    private float mTiltSensitivity = 2.5f;
+    private float mTiltSensitivity = 2.0f;
 
     /**
      * The forward tilt offset adjustment to counteract a natural forward phone tilt.
