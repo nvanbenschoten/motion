@@ -43,6 +43,12 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      */
     private float mParallaxIntensity = 1.2f;
 
+    /**
+     * The maximum percentage of offset translation that the image can move for each
+     * sensor input. Set to a negative number to disable.
+     */
+    private float mMaximumJump = .1f;
+
     // Instance variables used during matrix manipulation.
     private SensorInterpreter mSensorInterpreter;
     private SensorManager mSensorManager;
@@ -53,24 +59,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     private float mYOffset;
 
     public ParallaxImageView(Context context) {
-        super(context);
-        init(context, null);
+        this(context, null);
     }
 
     public ParallaxImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+        this(context, attrs, 0);
     }
 
     public ParallaxImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, attrs);
-    }
 
-    /**
-     * Initiates the ParallaxImageView with any given attributes.
-     */
-    private void init(Context context, AttributeSet attrs) {
         // Instantiate future objects
         mTranslationMatrix = new Matrix();
         mSensorInterpreter = new SensorInterpreter();
@@ -165,6 +163,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     }
 
     /**
+     * Sets the maximum percentage of the image that image matrix is allowed to translate
+     * for each sensor reading.
+     *
+     * @param maximumJump the new maximum jump
+     */
+    public void setMaximumJump(float maximumJump) {
+        mMaximumJump = maximumJump;
+    }
+
+    /**
      * Sets the image view's translation coordinates. These values must be between -1 and 1,
      * representing the transaction percentage from the center.
      *
@@ -185,6 +193,23 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
             // Set both scales to the max offset (should be negative, so smaller absolute value)
             xScale = Math.max(mXOffset, mYOffset);
             yScale = Math.max(mXOffset, mYOffset);
+        }
+
+        // Make sure below maximum jump limit
+        if (mMaximumJump > 0) {
+            // Limit x jump
+            if (x - mXTranslation / xScale > mMaximumJump) {
+                x = mXTranslation / xScale + mMaximumJump;
+            } else if (x - mXTranslation / xScale < -mMaximumJump) {
+                x = mXTranslation / xScale - mMaximumJump;
+            }
+
+            // Limit y jump
+            if (y - mYTranslation / yScale > mMaximumJump) {
+                y = mYTranslation / yScale + mMaximumJump;
+            } else if (y - mYTranslation / yScale < -mMaximumJump) {
+                y = mYTranslation / yScale - mMaximumJump;
+            }
         }
 
         mXTranslation = x * xScale;
