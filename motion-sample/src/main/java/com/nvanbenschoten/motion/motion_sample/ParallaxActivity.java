@@ -1,10 +1,10 @@
 package com.nvanbenschoten.motion.motion_sample;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,14 +19,15 @@ import android.widget.Switch;
 import com.nvanbenschoten.motion.ParallaxImageView;
 
 
-public class ParallaxActivity extends ActionBarActivity {
+public class ParallaxActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parallax);
+
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
+            getFragmentManager().beginTransaction()
                     .add(R.id.container, new ParallaxFragment())
                     .commit();
         }
@@ -175,5 +176,7 @@ public class ParallaxActivity extends ActionBarActivity {
                 mBackground.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background_rocket_small));
             }
         }
+
     }
+
 }

@@ -1,21 +1,28 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.nvanbenschoten.motion.motion_sample.ParallaxActivity" >
+<menu
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.nvanbenschoten.motion.motion_sample.ParallaxActivity"
+        >
 
-    <item android:id="@+id/action_parallax"
-        android:title="@string/action_parallax"
-        android:orderInCategory="98"
-        app:showAsAction="ifRoom" />
+    <item
+            android:id="@+id/action_parallax"
+            android:title="@string/action_parallax"
+            android:orderInCategory="98"
+            android:showAsAction="ifRoom"
+            />
 
-    <item android:id="@+id/action_switch"
-        android:title="@string/action_switch"
-        android:orderInCategory="99"
-        app:showAsAction="never" />
+    <item
+            android:id="@+id/action_switch"
+            android:title="@string/action_switch"
+            android:orderInCategory="99"
+            android:showAsAction="never"
+            />
 
-    <item android:id="@+id/action_portrait"
-        android:title="@string/action_lock_portrait"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+    <item
+            android:id="@+id/action_portrait"
+            android:title="@string/action_lock_portrait"
+            android:orderInCategory="100"
+            android:showAsAction="never"
+            />
 
 </menu>
