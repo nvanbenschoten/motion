@@ -3,8 +3,8 @@ Motion
 
 An Android library allowing images to exhibit a parallax effect. By replacing static pictures
 and backgrounds with a fluid images that reacts to screen tilt and orientation, Android
-applications can add a perceived depth and layering to their content. Motion works great for
-both full screen background images and smaller sized pictures to give users a whole new
+applications can add a perceived depth, layering, and context to their content. Motion works
+great for both full screen background images and smaller sized pictures to give users a whole new
 perspective on how they interact with their phone. This project was inspired in part by
 iOS 7's new parallax effect.
 
@@ -61,8 +61,8 @@ is most commonly done in the `onResume` method of an `Activity/Fragment`, but ca
 completed whenever the parallax effect is desired to begin.
 
 When the parallax effect is not longer needed, it is essential to unregister the SensorManager
-by calling `unregisterSensorManager()` on the ParallaxImageView. This call is usually
-completed in the `onPause` method.
+by calling `unregisterSensorManager()` on the ParallaxImageView so that the system sensors can
+be disabled. This call is usually completed in the `onPause` method.
 
 As an example
 
@@ -75,24 +75,28 @@ mBackground.registerSensorManager();
 
 ...
 
-// Unregister SensorManager when leaving
+// Unregister SensorManager when exiting
 mBackground.unregisterSensorManager();
 ```
 
 Configurations
 --------------
 
-There are three attributes that can be changed to adjust the parallax effect of the ImageView.
+There are four attributes that can be changed to adjust the parallax effect of the ImageView.
 Each can be accessed either through XML attributes or through Java functions.
 
-* parallaxIntensity - adjusts the strength of the parallax effect, giving control over the
+* parallaxIntensity (float) - adjusts the strength of the parallax effect, giving control over the
 perceived depth of the view.
 
-* tiltSensitivity - adjusts the sensitivity of the view towards tilting, changing how quickly
+* tiltSensitivity (float) - adjusts the sensitivity of the view towards tilting, changing how quickly
 the parallax's bounds are reached.
 
-* forwardTiltOffset - adjusts the tilt offset used to counteract a natural forward tilt of
+* forwardTiltOffset (float) - adjusts the tilt offset used to counteract a natural forward tilt of
 a phone while facing a user.
+
+* scaledIntensity (boolean) - adjusts whether the ImageView's x and y axis' parallax intensities
+are scaled to the image's aspect ratio or equal to each other and to the smaller of the axis'
+intensities (false by default).
 
 License
 -------
