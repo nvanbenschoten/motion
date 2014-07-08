@@ -13,8 +13,42 @@ iOS 7's new parallax effect.
 Demo
 ----
 
-Feel free to download the [demo](https://github.com/nvanbenschoten/motion/releases) to try
-out motion.
+Feel free to download the [demo][1] to try out motion.
+
+Setup
+-----
+* In Eclipse, just import the library as an Android library project.
+* Project > Clean to generate the binaries you need, like R.java, etc.
+* Then, just add Motion as a dependency to your existing project and you're good to go!
+
+**Or**:
+
+* [Download the .jar file][2]
+* Add the .jar files to your project's `libs` folder, or add them as external jars to your project's
+build path.
+
+**Or**:
+
+Add the following to your `build.gradle`:
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies{
+		compile 'com.nvanbenschoten.motion:library:1.0.1'
+	}
+
+**Or**:
+
+Add the following to your `pom.xml`:
+
+	<dependency>
+		<groupId>com.nvanbenschoten.motion</groupId>
+		<artifactId>library</artifactId>
+		<version>1.0.1</version>
+		<type>aar</type>
+	</dependency>
 
 Usage
 -----
@@ -76,3 +110,6 @@ License
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+ [1]: https://github.com/nvanbenschoten/motion/releases
+ [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.0.1/com.nvanbenschoten.motion-1.0.1.jar
