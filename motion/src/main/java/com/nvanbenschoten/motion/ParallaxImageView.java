@@ -276,12 +276,23 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * an Activity or Fragment to avoid continuing sensor usage.
      */
     public void unregisterSensorManager() {
+        unregisterSensorManager(true);
+    }
+
+    /**
+     * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause from
+     * an Activity or Fragment to avoid continuing sensor usage.
+     * @param resetTranslation if the image translation should be reset to the origin
+     */
+    public void unregisterSensorManager(boolean resetTranslation) {
         if (mSensorManager == null) return;
 
         mSensorManager.unregisterListener(this);
         mSensorManager = null;
 
-        setTranslate(0, 0);
+        if (resetTranslation) {
+            setTranslate(0, 0);
+        }
     }
 
     @Override
