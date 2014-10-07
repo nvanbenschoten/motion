@@ -36,7 +36,7 @@ Add the following to your `build.gradle`:
 	}
 
 	dependencies{
-		compile 'com.nvanbenschoten.motion:library:1.0.1'
+		compile 'com.nvanbenschoten.motion:library:1.0.2'
 	}
 
 **Or**:
@@ -46,7 +46,7 @@ Add the following to your `pom.xml`:
 	<dependency>
 		<groupId>com.nvanbenschoten.motion</groupId>
 		<artifactId>library</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<type>aar</type>
 	</dependency>
 

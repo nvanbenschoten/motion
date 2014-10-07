@@ -276,7 +276,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * an Activity or Fragment to avoid continuing sensor usage.
      */
     public void unregisterSensorManager() {
-        unregisterSensorManager(true);
+        unregisterSensorManager(false);
     }
 
     /**

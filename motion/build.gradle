@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 20
-        versionCode 30
-        versionName '1.0.1'
+        versionCode 31
+        versionName '1.0.2'
     }
     buildTypes {
         release {
@@ -23,4 +23,4 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-apply from: 'https://raw.githubusercontent.com/hdodenhof/gradle-mvn-push/8af285eace237339b4af4cf637ff563f66ba15b6/gradle-mvn-push.gradle'
+apply from: 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
