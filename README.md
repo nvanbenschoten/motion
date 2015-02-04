@@ -1,4 +1,5 @@
-Motion
+[![AndroidLibs](https://img.shields.io/badge/AndroidLibs-motion-brightgreen.svg?style=flat)](https://www.android-libs.com/lib/motion?utm_source=github-badge&utm_medium=github-badge&utm_campaign=github-badge)
+			Motion
 ======
 
 An Android library allowing images to exhibit a parallax effect. By replacing static pictures
