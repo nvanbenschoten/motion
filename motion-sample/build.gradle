@@ -19,7 +19,7 @@ android {
 }
 
 dependencies {
-    compile project(":motion")
+    compile project(':motion')
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
