@@ -30,26 +30,26 @@ build path.
 **Or**:
 
 Add the following to your `build.gradle`:
+```java
+repositories {
+	mavenCentral()
+}
 
-	repositories {
-		mavenCentral()
-	}
-
-	dependencies{
-		compile 'com.nvanbenschoten.motion:library:1.0.2'
-	}
-
+dependencies{
+	compile 'com.nvanbenschoten.motion:library:1.0.2'
+}
+```
 **Or**:
 
 Add the following to your `pom.xml`:
-
-	<dependency>
-		<groupId>com.nvanbenschoten.motion</groupId>
-		<artifactId>library</artifactId>
-		<version>1.0.2</version>
-		<type>aar</type>
-	</dependency>
-
+```xml
+<dependency>
+	<groupId>com.nvanbenschoten.motion</groupId>
+	<artifactId>library</artifactId>
+	<version>1.0.2</version>
+	<type>aar</type>
+</dependency>
+```
 Usage
 -----
 
