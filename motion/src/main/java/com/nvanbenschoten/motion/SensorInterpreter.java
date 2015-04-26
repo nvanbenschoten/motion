@@ -2,8 +2,14 @@ package com.nvanbenschoten.motion;
 
 import android.content.Context;
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 import android.view.Surface;
 import android.view.WindowManager;
+
+import static android.hardware.SensorManager.AXIS_MINUS_X;
+import static android.hardware.SensorManager.AXIS_MINUS_Y;
+import static android.hardware.SensorManager.AXIS_X;
+import static android.hardware.SensorManager.AXIS_Y;
 
 /*
  * Copyright 2014 Nathan VanBenschoten
@@ -20,14 +26,30 @@ import android.view.WindowManager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class SensorInterpreter {
+class SensorInterpreter {
 
     private static final String TAG = SensorInterpreter.class.getName();
 
     /**
-     * The standardized vectors corresponding to yaw, pitch, and roll.
+     * The standardized tilt vector corresponding to yaw, pitch, and roll deltas from target matrix.
      */
-    private float[] mVectors;
+    private float[] mTiltVector = new float[3];
+
+    /**
+     * Whether the SensorInterpreter has set a target to calculate tilt offset from.
+     */
+    private boolean mTargeted = false;
+
+    /**
+     * The target rotation matrix to calculate tilt offset from.
+     */
+    private float[] mTargetMatrix = new float[16];
+
+    /**
+     * Rotation matrices used during calculation.
+     */
+    private float[] mRotationMatrix = new float[16];
+    private float[] mOrientedRotationMatrix = new float[16];
 
     /**
      * The sensitivity the parallax effect has towards tilting.
@@ -35,28 +57,26 @@ public class SensorInterpreter {
     private float mTiltSensitivity = 2.0f;
 
     /**
-     * The forward tilt offset adjustment to counteract a natural forward phone tilt.
-     */
-    private float mForwardTiltOffset = 0.3f;
-
-    public SensorInterpreter() {
-        mVectors = new float[3];
-    }
-
-    /**
-     * Converts sensor data to yaw, pitch, and roll
+     * Converts sensor data to yaw, pitch, and roll.
      *
      * @param context the context of the
      * @param event the event to interpret
-     * @return and interpreted array of yaw, pitch, and roll vectors
+     * @return an interpreted vector of yaw, pitch, and roll delta values
      */
-    public final float[] interpretSensorEvent(Context context, SensorEvent event) {
-        if (event == null ||
-                event.values.length < 3 ||
-                event.values[0] == 0 ||
-                event.values[1] == 0 ||
-                event.values[2] == 0)
+    @SuppressWarnings("SuspiciousNameCombination")
+    public float[] interpretSensorEvent(Context context, SensorEvent event) {
+        if (event == null) {
             return null;
+        }
+
+        // Set target rotation if none has been set
+        if (!mTargeted) {
+            setTargetVector(event.values);
+            return null;
+        }
+
+        // Get rotation matrix from event's values
+        SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
 
         // Acquire rotation of screen
         final int rotation = ((WindowManager) context
@@ -64,74 +84,86 @@ public class SensorInterpreter {
                 .getDefaultDisplay()
                 .getRotation();
 
-        // Adjust for forward tilt based on screen orientation
-        switch (rotation) {
-            case Surface.ROTATION_90:
-                mVectors[0] = event.values[0];
-                mVectors[1] = event.values[2];
-                mVectors[2] = -event.values[1];
-                break;
+        // Calculate angle differential between target and current orientation
+        if (rotation == Surface.ROTATION_0) {
+            SensorManager.getAngleChange(mTiltVector, mRotationMatrix, mTargetMatrix);
+        } else {
+            // Adjust axes on screen orientation by remapping coordinates
+            switch (rotation) {
+                case Surface.ROTATION_90:
+                    SensorManager.remapCoordinateSystem(mRotationMatrix, AXIS_Y, AXIS_MINUS_X, mOrientedRotationMatrix);
+                    break;
 
-            case Surface.ROTATION_180:
-                mVectors[0] = event.values[0];
-                mVectors[1] = event.values[1];
-                mVectors[2] = event.values[2];
-                break;
+                case Surface.ROTATION_180:
+                    SensorManager.remapCoordinateSystem(mRotationMatrix, AXIS_MINUS_X, AXIS_MINUS_Y, mOrientedRotationMatrix);
+                    break;
 
-            case Surface.ROTATION_270:
-                mVectors[0] = event.values[0];
-                mVectors[1] = -event.values[2];
-                mVectors[2] = event.values[1];
-                break;
+                case Surface.ROTATION_270:
+                    SensorManager.remapCoordinateSystem(mRotationMatrix, AXIS_MINUS_Y, AXIS_X, mOrientedRotationMatrix);
+                    break;
+            }
 
-            default:
-                mVectors[0] = event.values[0];
-                mVectors[1] = -event.values[1];
-                mVectors[2] = -event.values[2];
-                break;
+            SensorManager.getAngleChange(mTiltVector, mOrientedRotationMatrix, mTargetMatrix);
         }
 
-        // Adjust roll for sensitivity differences based on pitch
-        // double tiltScale = 1/Math.cos(mVectors[1] * Math.PI/180);
-        // if (tiltScale > 12) tiltScale = 12;
-        // if (tiltScale < -12) tiltScale = -12;
-        // mVectors[2] *= tiltScale;
+        // Perform value scaling and clamping on value array
+        for (int i = 0; i < mTiltVector.length; i++) {
+            // Map domain of tilt vector from radian (-PI, PI) to fraction (-1, 1)
+            mTiltVector[i] /= Math.PI;
 
-        // Make roll and pitch percentages out of 1
-        mVectors[1] /= 90;
-        mVectors[2] /= 90;
+            // Adjust for tilt sensitivity
+            mTiltVector[i] *= mTiltSensitivity;
 
-        // Add in forward tilt offset
-        mVectors[1] -= mForwardTiltOffset;
-        if (mVectors[1] < -1) mVectors[1] += 2;
+            // Clamp values to image bounds
+            if (mTiltVector[i] > 1) {
+                mTiltVector[i] = 1f;
+            } else if (mTiltVector[i] < -1) {
+                mTiltVector[i] = -1f;
+            }
+        }
 
-        // Adjust for tilt sensitivity
-        mVectors[1] *= mTiltSensitivity;
-        mVectors[2] *= mTiltSensitivity;
-
-        // Clamp values to image bounds
-        if (mVectors[1] > 1) mVectors[1] = 1f;
-        if (mVectors[1] < -1) mVectors[1] = -1f;
-
-        if (mVectors[2] > 1) mVectors[2] = 1f;
-        if (mVectors[2] < -1) mVectors[2] = -1f;
-
-        return mVectors;
+        return mTiltVector;
     }
 
-    public float getForwardTiltOffset() {
-        return mForwardTiltOffset;
+    /**
+     * Sets the target direction used for angle deltas to determine tilt.
+     *
+     * @param values a rotation vector (presumably from a ROTATION_VECTOR sensor)
+     */
+    protected void setTargetVector(float[] values) {
+        SensorManager.getRotationMatrixFromVector(mTargetMatrix, values);
+        mTargeted = true;
     }
 
-    public void setForwardTiltOffset(float forwardTiltOffset) {
-        mForwardTiltOffset = forwardTiltOffset;
+    /**
+     * Resets the state of the SensorInterpreter, removing any target direction used for angle
+     * deltas to determine tilt.
+     */
+    public void reset() {
+        mTargeted = false;
     }
 
+    /**
+     * Determines the tilt sensitivity of the SensorInterpreter.
+     *
+     * @return the tilt sensitivity
+     */
     public float getTiltSensitivity() {
         return mTiltSensitivity;
     }
 
+    /**
+     * Sets the new sensitivity that the SensorInterpreter will scale tilt calculations by. If this
+     * sensitivity is above 1, the interpreter will have to clamp percentages to 100% and -100% at
+     * the tilt extremes.
+     *
+     * @param tiltSensitivity the new tilt sensitivity
+     */
     public void setTiltSensitivity(float tiltSensitivity) {
+        if (tiltSensitivity <= 0) {
+            throw new IllegalArgumentException("Tilt sensitivity must be positive");
+        }
+
         mTiltSensitivity = tiltSensitivity;
     }
 
