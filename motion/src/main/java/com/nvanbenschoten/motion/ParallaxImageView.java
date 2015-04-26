@@ -81,19 +81,18 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
             final TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.ParallaxImageView);
 
             if (customAttrs != null) {
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_intensity))
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_intensity)) {
                     setParallaxIntensity(customAttrs.getFloat(R.styleable.ParallaxImageView_intensity, mParallaxIntensity));
+                }
 
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_scaledIntensity))
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_scaledIntensity)) {
                     setScaledIntensities(customAttrs.getBoolean(R.styleable.ParallaxImageView_scaledIntensity, mScaledIntensities));
+                }
 
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_tiltSensitivity))
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_tiltSensitivity)) {
                     setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_tiltSensitivity,
                             mSensorInterpreter.getTiltSensitivity()));
-
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_forwardTiltOffset))
-                    setForwardTiltOffset(customAttrs.getFloat(R.styleable.ParallaxImageView_forwardTiltOffset,
-                            mSensorInterpreter.getForwardTiltOffset()));
+                }
 
                 customAttrs.recycle();
             }
@@ -114,6 +113,63 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         configureMatrix();
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (mSensorInterpreter == null) return;
+        final float [] vectors = mSensorInterpreter.interpretSensorEvent(getContext(), event);
+
+        // Return if interpretation of data failed
+        if (vectors == null) return;
+
+        // Set translation on ImageView matrix
+        setTranslate(vectors[2], -vectors[1]);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+
+    /**
+     * Registers a sensor manager with the parallax ImageView. Should be called in onResume
+     * or onStart lifecycle callbacks from an Activity or Fragment.
+     */
+    public void registerSensorManager() {
+        if (getContext() == null || mSensorManager != null) return;
+
+        // Acquires a sensor manager
+        mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+
+        if (mSensorManager != null) {
+            mSensorManager.registerListener(this,
+                    mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
+                    SensorManager.SENSOR_DELAY_FASTEST);
+        }
+    }
+
+    /**
+     * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause or onStop
+     * lifecycle callbacks from an Activity or Fragment to avoid leaking sensor usage.
+     */
+    public void unregisterSensorManager() {
+        unregisterSensorManager(false);
+    }
+
+    /**
+     * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause from
+     * an Activity or Fragment to avoid continuing sensor usage.
+     * @param resetTranslation if the image translation should be reset to the origin
+     */
+    public void unregisterSensorManager(boolean resetTranslation) {
+        if (mSensorManager == null || mSensorInterpreter == null) return;
+
+        mSensorManager.unregisterListener(this);
+        mSensorManager = null;
+        mSensorInterpreter.reset();
+
+        if (resetTranslation) {
+            setTranslate(0, 0);
+        }
+    }
+
     /**
      * Sets the intensity of the parallax effect. The stronger the effect, the more distance
      * the image will have to move around.
@@ -121,8 +177,9 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param parallaxIntensity the new intensity
      */
     public void setParallaxIntensity(float parallaxIntensity) {
-        if (parallaxIntensity < 1)
+        if (parallaxIntensity < 1) {
             throw new IllegalArgumentException("Parallax effect must have a intensity of 1.0 or greater");
+        }
 
         mParallaxIntensity = parallaxIntensity;
         configureMatrix();
@@ -137,19 +194,6 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      */
     public void setTiltSensitivity(float sensitivity) {
         mSensorInterpreter.setTiltSensitivity(sensitivity);
-    }
-
-    /**
-     * Sets the forward tilt offset dimension, allowing for the image to be
-     * centered while the phone is "naturally" tilted forwards.
-     *
-     * @param forwardTiltOffset the new tilt forward adjustment
-     */
-    public void setForwardTiltOffset(float forwardTiltOffset) {
-        if (Math.abs(forwardTiltOffset) > 1)
-            throw new IllegalArgumentException("Parallax forward tilt offset must be less than or equal to 1.0");
-
-        mSensorInterpreter.setForwardTiltOffset(forwardTiltOffset);
     }
 
     /**
@@ -180,8 +224,9 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * @param y the vertical translation
      */
     private void setTranslate(float x, float y) {
-        if (Math.abs(x) > 1 || Math.abs(y) > 1)
+        if (Math.abs(x) > 1 || Math.abs(y) > 1) {
             throw new IllegalArgumentException("Parallax effect cannot translate more than 100% of its off-screen size");
+        }
 
         float xScale, yScale;
 
@@ -251,62 +296,5 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         mTranslationMatrix.postTranslate(dx, dy);
         setImageMatrix(mTranslationMatrix);
     }
-
-    /**
-     * Registers a sensor manager with the parallax ImageView. Should be called in onResume
-     * from an Activity or Fragment.
-     *
-     */
-    @SuppressWarnings("deprecation")
-    public void registerSensorManager() {
-        if (getContext() == null || mSensorManager != null) return;
-
-        // Acquires a sensor manager
-        mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-
-        if (mSensorManager != null) {
-            mSensorManager.registerListener(this,
-                    mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-                    SensorManager.SENSOR_DELAY_FASTEST);
-        }
-    }
-
-    /**
-     * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause from
-     * an Activity or Fragment to avoid continuing sensor usage.
-     */
-    public void unregisterSensorManager() {
-        unregisterSensorManager(false);
-    }
-
-    /**
-     * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause from
-     * an Activity or Fragment to avoid continuing sensor usage.
-     * @param resetTranslation if the image translation should be reset to the origin
-     */
-    public void unregisterSensorManager(boolean resetTranslation) {
-        if (mSensorManager == null) return;
-
-        mSensorManager.unregisterListener(this);
-        mSensorManager = null;
-
-        if (resetTranslation) {
-            setTranslate(0, 0);
-        }
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        final float [] vectors = mSensorInterpreter.interpretSensorEvent(getContext(), event);
-
-        // Return if interpretation of data failed
-        if (vectors == null) return;
-
-        // Set translation on ImageView matrix
-        setTranslate(vectors[2], vectors[1]);
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
 }
