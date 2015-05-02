@@ -1,12 +1,13 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
+apply plugin: 'de.mobilej.unmock'
 
 android {
     compileSdkVersion 22
     buildToolsVersion '22.0.1'
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 22
         versionCode Integer.parseInt(project.VERSION_CODE)
         versionName project.VERSION_NAME
@@ -24,6 +25,15 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
+}
+
+unMock {
+    allAndroid = 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/5.0.0_r2-robolectric-1/android-all-5.0.0_r2-robolectric-1.jar'
+
+    keep = [
+            "android.hardware.SensorEvent",
+            "android.hardware.SensorManager",
+    ]
 }
 
 apply from: 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
