@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies{
-	compile 'com.nvanbenschoten.motion:library:1.0.2'
+	compile 'com.nvanbenschoten.motion:library:1.1.0'
 }
 ```
 **Or**:
@@ -46,7 +46,7 @@ Add the following to your `pom.xml`:
 <dependency>
 	<groupId>com.nvanbenschoten.motion</groupId>
 	<artifactId>library</artifactId>
-	<version>1.0.2</version>
+	<version>1.1.0</version>
 	<type>aar</type>
 </dependency>
 ```
@@ -91,9 +91,6 @@ perceived depth of the view.
 * tiltSensitivity (float) - adjusts the sensitivity of the view towards tilting, changing how quickly
 the parallax's bounds are reached.
 
-* forwardTiltOffset (float) - adjusts the tilt offset used to counteract a natural forward tilt of
-a phone while facing a user.
-
 * scaledIntensity (boolean) - adjusts whether the ImageView's x and y axis' parallax intensities
 are scaled to the image's aspect ratio or equal to each other and to the smaller of the axis'
 intensities (false by default).
@@ -116,4 +113,4 @@ License
     limitations under the License.
 
  [1]: https://github.com/nvanbenschoten/motion/releases
- [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.0.1/com.nvanbenschoten.motion-1.0.1.jar
+ [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.1.0/com.nvanbenschoten.motion-1.1.0.jar
