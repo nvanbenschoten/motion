@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ParallaxImageView">
-        <attr name="intensity" format="float"/>
-        <attr name="tiltSensitivity" format="float"/>
-        <attr name="scaledIntensity" format="boolean"/>
+        <attr name="mtn_intensity" format="float"/>
+        <attr name="mtn_tiltSensitivity" format="float"/>
+        <attr name="mtn_scaledIntensity" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -81,16 +81,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
             final TypedArray customAttrs = context.obtainStyledAttributes(attrs, R.styleable.ParallaxImageView);
 
             if (customAttrs != null) {
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_intensity)) {
-                    setParallaxIntensity(customAttrs.getFloat(R.styleable.ParallaxImageView_intensity, mParallaxIntensity));
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_mtn_intensity)) {
+                    setParallaxIntensity(customAttrs.getFloat(R.styleable.ParallaxImageView_mtn_intensity, mParallaxIntensity));
                 }
 
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_scaledIntensity)) {
-                    setScaledIntensities(customAttrs.getBoolean(R.styleable.ParallaxImageView_scaledIntensity, mScaledIntensities));
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_mtn_scaledIntensity)) {
+                    setScaledIntensities(customAttrs.getBoolean(R.styleable.ParallaxImageView_mtn_scaledIntensity, mScaledIntensities));
                 }
 
-                if (customAttrs.hasValue(R.styleable.ParallaxImageView_tiltSensitivity)) {
-                    setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_tiltSensitivity,
+                if (customAttrs.hasValue(R.styleable.ParallaxImageView_mtn_tiltSensitivity)) {
+                    setTiltSensitivity(customAttrs.getFloat(R.styleable.ParallaxImageView_mtn_tiltSensitivity,
                             mSensorInterpreter.getTiltSensitivity()));
                 }
 
