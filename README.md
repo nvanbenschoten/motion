@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies{
-	compile 'com.nvanbenschoten.motion:library:1.1.0'
+	compile 'com.nvanbenschoten.motion:library:1.1.1'
 }
 ```
 **Or**:
@@ -46,7 +46,7 @@ Add the following to your `pom.xml`:
 <dependency>
 	<groupId>com.nvanbenschoten.motion</groupId>
 	<artifactId>library</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<type>aar</type>
 </dependency>
 ```
@@ -85,13 +85,13 @@ Configurations
 There are three attributes that can be changed to adjust the parallax effect of the ImageView.
 Each can be accessed either through XML attributes or through Java functions.
 
-* motionIntensity (float) - adjusts the strength of the parallax effect, giving control over the
+* intensity (attr:motionIntensity) (float) - adjusts the strength of the parallax effect, giving control over the
 perceived depth of the view.
 
-* motionTiltSensitivity (float) - adjusts the sensitivity of the view towards tilting, changing how quickly
+* tiltSensitivity (attr:motionTiltSensitivity) (float) - adjusts the sensitivity of the view towards tilting, changing how quickly
 the parallax's bounds are reached.
 
-* motionScaledIntensity (boolean) - adjusts whether the ImageView's x and y axis' parallax intensities
+* scaledIntensity (attr:motionScaledIntensity) (boolean) - adjusts whether the ImageView's x and y axis' parallax intensities
 are scaled to the image's aspect ratio or equal to each other and to the smaller of the axis'
 intensities (false by default).
 
@@ -113,4 +113,4 @@ License
     limitations under the License.
 
  [1]: https://github.com/nvanbenschoten/motion/releases
- [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.1.0/com.nvanbenschoten.motion-1.1.0.jar
+ [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.1.1/com.nvanbenschoten.motion-1.1.1.jar
