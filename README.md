@@ -1,4 +1,4 @@
-Motion
+Motion [ ![Download](https://api.bintray.com/packages/nvanbenschoten/maven/com.nvanbenschoten.motion%3Alibrary/images/download.svg) ](https://bintray.com/nvanbenschoten/maven/com.nvanbenschoten.motion%3Alibrary/_latestVersion)
 ======
 
 An Android library allowing images to exhibit a parallax effect. By replacing static pictures
@@ -32,7 +32,7 @@ build path.
 Add the following to your `build.gradle`:
 ```java
 repositories {
-	mavenCentral()
+	jcenter()
 }
 
 dependencies{
@@ -82,7 +82,7 @@ mBackground.unregisterSensorManager();
 Configurations
 --------------
 
-There are four attributes that can be changed to adjust the parallax effect of the ImageView.
+There are three attributes that can be changed to adjust the parallax effect of the ImageView.
 Each can be accessed either through XML attributes or through Java functions.
 
 * parallaxIntensity (float) - adjusts the strength of the parallax effect, giving control over the
