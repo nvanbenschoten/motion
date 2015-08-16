@@ -82,16 +82,16 @@ mBackground.unregisterSensorManager();
 Configurations
 --------------
 
-There are four attributes that can be changed to adjust the parallax effect of the ImageView.
+There are three attributes that can be changed to adjust the parallax effect of the ImageView.
 Each can be accessed either through XML attributes or through Java functions.
 
-* parallaxIntensity (float) - adjusts the strength of the parallax effect, giving control over the
+* motionIntensity (float) - adjusts the strength of the parallax effect, giving control over the
 perceived depth of the view.
 
-* tiltSensitivity (float) - adjusts the sensitivity of the view towards tilting, changing how quickly
+* motionTiltSensitivity (float) - adjusts the sensitivity of the view towards tilting, changing how quickly
 the parallax's bounds are reached.
 
-* scaledIntensity (boolean) - adjusts whether the ImageView's x and y axis' parallax intensities
+* motionScaledIntensity (boolean) - adjusts whether the ImageView's x and y axis' parallax intensities
 are scaled to the image's aspect ratio or equal to each other and to the smaller of the axis'
 intensities (false by default).
 
