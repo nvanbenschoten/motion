@@ -116,7 +116,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (mSensorInterpreter == null) return;
-        final float [] vectors = mSensorInterpreter.interpretSensorEvent(getContext(), event);
+        final float[] vectors = mSensorInterpreter.interpretSensorEvent(getContext(), event);
 
         // Return if interpretation of data failed
         if (vectors == null) return;
@@ -156,6 +156,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
     /**
      * Unregisters the ParallaxImageView's SensorManager. Should be called in onPause from
      * an Activity or Fragment to avoid continuing sensor usage.
+     *
      * @param resetTranslation if the image translation should be reset to the origin
      */
     public void unregisterSensorManager(boolean resetTranslation) {
