@@ -2,18 +2,12 @@ package com.nvanbenschoten.motion;
 
 import android.content.Context;
 import android.hardware.SensorEvent;
-import android.view.Display;
 import android.view.Surface;
-import android.view.WindowManager;
 
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.lang.reflect.Constructor;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 /*
  * Copyright 2014 Nathan VanBenschoten
@@ -40,8 +34,8 @@ public class SensorInterpreterTest {
         sensorInterpreter.setTiltSensitivity(2);
         sensorInterpreter.setTargetVector(new float[]{0.5f, 0.6f, 0.7f});
 
-        Context context = mockRotationContext(Surface.ROTATION_0);
-        SensorEvent event = mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
+        Context context = TestUtils.mockRotationContext(Surface.ROTATION_0);
+        SensorEvent event = TestUtils.mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
 
         float[] interpreted = sensorInterpreter.interpretSensorEvent(context, event);
 
@@ -54,8 +48,8 @@ public class SensorInterpreterTest {
         sensorInterpreter.setTiltSensitivity(2);
         sensorInterpreter.setTargetVector(new float[]{0.5f, 0.6f, 0.7f});
 
-        Context context = mockRotationContext(Surface.ROTATION_90);
-        SensorEvent event = mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
+        Context context = TestUtils.mockRotationContext(Surface.ROTATION_90);
+        SensorEvent event = TestUtils.mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
 
         float[] interpreted = sensorInterpreter.interpretSensorEvent(context, event);
 
@@ -68,8 +62,8 @@ public class SensorInterpreterTest {
         sensorInterpreter.setTiltSensitivity(2);
         sensorInterpreter.setTargetVector(new float[]{0.5f, 0.6f, 0.7f});
 
-        Context context = mockRotationContext(Surface.ROTATION_270);
-        SensorEvent event = mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
+        Context context = TestUtils.mockRotationContext(Surface.ROTATION_270);
+        SensorEvent event = TestUtils.mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
 
         float[] interpreted = sensorInterpreter.interpretSensorEvent(context, event);
 
@@ -82,8 +76,8 @@ public class SensorInterpreterTest {
         sensorInterpreter.setTiltSensitivity(2);
         sensorInterpreter.setTargetVector(new float[]{0.5f, 0.6f, 0.7f});
 
-        Context context = mockRotationContext(Surface.ROTATION_180);
-        SensorEvent event = mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
+        Context context = TestUtils.mockRotationContext(Surface.ROTATION_180);
+        SensorEvent event = TestUtils.mockSensorEvent(new float[]{0.7f, 0.7f, 0.7f});
 
         float[] interpreted = sensorInterpreter.interpretSensorEvent(context, event);
 
@@ -96,8 +90,8 @@ public class SensorInterpreterTest {
         sensorInterpreter.setTiltSensitivity(1.5f);
         sensorInterpreter.setTargetVector(new float[]{0f, 0f, 0f});
 
-        Context context = mockRotationContext(Surface.ROTATION_0);
-        SensorEvent event = mockSensorEvent(new float[]{3.1f, 0f, 3.1f});
+        Context context = TestUtils.mockRotationContext(Surface.ROTATION_0);
+        SensorEvent event = TestUtils.mockSensorEvent(new float[]{3.1f, 0f, 3.1f});
 
         float[] interpreted = sensorInterpreter.interpretSensorEvent(context, event);
 
@@ -115,28 +109,6 @@ public class SensorInterpreterTest {
     public void testSetNegativeTiltSensitivity() throws Exception {
         SensorInterpreter sensorInterpreter = new SensorInterpreter();
         sensorInterpreter.setTiltSensitivity(-1);
-    }
-
-    private Context mockRotationContext(int rotation) {
-        Display display = Mockito.mock(Display.class);
-        when(display.getRotation()).thenReturn(rotation);
-
-        WindowManager windowManager = Mockito.mock(WindowManager.class);
-        when(windowManager.getDefaultDisplay()).thenReturn(display);
-
-        Context context = Mockito.mock(Context.class);
-        when(context.getSystemService(Context.WINDOW_SERVICE)).thenReturn(windowManager);
-        return context;
-    }
-
-    private SensorEvent mockSensorEvent(float[] values) throws Exception {
-        Constructor<SensorEvent> c = SensorEvent.class.getDeclaredConstructor(int.class);
-        c.setAccessible(true);
-
-        SensorEvent event = c.newInstance(values.length);
-        System.arraycopy(values, 0, event.values, 0, values.length);
-
-        return event;
     }
 
 }

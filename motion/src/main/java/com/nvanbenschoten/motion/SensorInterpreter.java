@@ -3,6 +3,9 @@ package com.nvanbenschoten.motion;
 import android.content.Context;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.Surface;
 import android.view.WindowManager;
 
@@ -52,31 +55,39 @@ class SensorInterpreter {
     private float[] mOrientedRotationMatrix = new float[16];
 
     /**
+     * Holds a shortened version of the rotation vector for compatibility purposes.
+     */
+    private float[] mTruncatedRotationVector;
+
+    /**
      * The sensitivity the parallax effect has towards tilting.
      */
     private float mTiltSensitivity = 2.0f;
 
     /**
-     * Converts sensor data to yaw, pitch, and roll.
+     * Converts sensor data in a {@link SensorEvent} to yaw, pitch, and roll.
      *
      * @param context the context of the
-     * @param event the event to interpret
+     * @param event   the event to interpret
      * @return an interpreted vector of yaw, pitch, and roll delta values
      */
     @SuppressWarnings("SuspiciousNameCombination")
-    public float[] interpretSensorEvent(Context context, SensorEvent event) {
+    public float[] interpretSensorEvent(@NonNull Context context, @Nullable SensorEvent event) {
         if (event == null) {
             return null;
         }
 
+        // Retrieves the RotationVector from SensorEvent
+        float[] rotationVector = getRotationVectorFromSensorEvent(event);
+
         // Set target rotation if none has been set
         if (!mTargeted) {
-            setTargetVector(event.values);
+            setTargetVector(rotationVector);
             return null;
         }
 
         // Get rotation matrix from event's values
-        SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+        SensorManager.getRotationMatrixFromVector(mRotationMatrix, rotationVector);
 
         // Acquire rotation of screen
         final int rotation = ((WindowManager) context
@@ -123,6 +134,31 @@ class SensorInterpreter {
         }
 
         return mTiltVector;
+    }
+
+    /**
+     * Pulls out the rotation vector from a {@link SensorEvent}, with a maximum length
+     * vector of four elements to avoid potential compatibility issues.
+     *
+     * @param event the sensor event
+     * @return the events rotation vector, potentially truncated
+     */
+    @NonNull
+    @VisibleForTesting
+    float[] getRotationVectorFromSensorEvent(@NonNull SensorEvent event) {
+        if (event.values.length > 4) {
+            // On some Samsung devices SensorManager.getRotationMatrixFromVector
+            // appears to throw an exception if rotation vector has length > 4.
+            // For the purposes of this class the first 4 values of the
+            // rotation vector are sufficient (see crbug.com/335298 for details).
+            if (mTruncatedRotationVector == null) {
+                mTruncatedRotationVector = new float[4];
+            }
+            System.arraycopy(event.values, 0, mTruncatedRotationVector, 0, 4);
+            return mTruncatedRotationVector;
+        } else {
+            return event.values;
+        }
     }
 
     /**
