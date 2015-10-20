@@ -133,6 +133,16 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
      * or onStart lifecycle callbacks from an Activity or Fragment.
      */
     public void registerSensorManager() {
+        registerSensorManager(SensorManager.SENSOR_DELAY_FASTEST);
+    }
+
+    /**
+     * Registers a sensor manager with the parallax ImageView. Should be called in onResume
+     * or onStart lifecycle callbacks from an Activity or Fragment.
+     *
+     * @param samplingPeriodUs the sensor sampling period rate
+     */
+    public void registerSensorManager(int samplingPeriodUs) {
         if (getContext() == null || mSensorManager != null) return;
 
         // Acquires a sensor manager
@@ -141,7 +151,7 @@ public class ParallaxImageView extends ImageView implements SensorEventListener 
         if (mSensorManager != null) {
             mSensorManager.registerListener(this,
                     mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
-                    SensorManager.SENSOR_DELAY_FASTEST);
+                    samplingPeriodUs);
         }
     }
 
