@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies{
-	compile 'com.nvanbenschoten.motion:library:1.1.1'
+	compile 'com.nvanbenschoten.motion:library:1.1.2'
 }
 ```
 **Or**:
@@ -46,7 +46,7 @@ Add the following to your `pom.xml`:
 <dependency>
 	<groupId>com.nvanbenschoten.motion</groupId>
 	<artifactId>library</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<type>aar</type>
 </dependency>
 ```
@@ -113,4 +113,4 @@ License
     limitations under the License.
 
  [1]: https://github.com/nvanbenschoten/motion/releases
- [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.1.1/com.nvanbenschoten.motion-1.1.1.jar
+ [2]: https://github.com/nvanbenschoten/motion/releases/download/v1.1.2/com.nvanbenschoten.motion-1.1.2.jar
